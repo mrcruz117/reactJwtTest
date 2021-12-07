@@ -3,12 +3,18 @@ import { Button, Card } from "@mui/material";
 import axios from "axios";
 
 export default function RequestTester() {
-  const [response, set_response] = useState("Test info");
+  const [response, set_response] = useState([{ username: "test" }]);
 
   const makeRequest = () => {
     // add https request for JWT testing later
 
-    set_response("button working");
+    axios
+      .get("http://localhost:3344/posts")
+      .then((res) => {
+        console.log(res.data);
+        set_response(res.data);
+      })
+      .catch((err) => console.error(err));
   };
   return (
     <div
@@ -34,7 +40,7 @@ export default function RequestTester() {
           GO
         </Button>
         <br />
-        <div style={{ marginTop: "10px" }}>{response}</div>
+        <div style={{ marginTop: "10px" }}>{response[0].username}</div>
       </Card>
     </div>
   );
