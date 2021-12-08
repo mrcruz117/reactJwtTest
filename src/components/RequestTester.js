@@ -3,38 +3,41 @@ import { Button, Card, ButtonGroup } from "@mui/material";
 import axios from "axios";
 
 export default function RequestTester() {
-  const [response, set_response] = useState([{ username: "test" }]);
-  const [jwt, set_jwt] = useState("");
+  const [response, set_response] = useState("Make a request");
+  // const [jwt, set_jwt] = useState("");
 
   const makeRequest = () => {
     // add https request for JWT testing later
 
     axios
-      .get("http://localhost:3344/posts", {
-        headers: { authorization: `Bearer ${getCookie("jwt")}` },
+      .get("/myapp/", {
+        headers: { Authorization: `JWT ${getCookie("access")}` },
       })
       .then((res) => {
-        console.log(res.data[0]);
-        set_response(res.data);
+        console.log("success: ", res.data);
+        set_response("success!");
       })
       .catch((err) => {
-        set_response([{ username: "Error: Forbiden" }]);
+        set_response("Error: Forbiden");
         console.error(err);
       });
   };
 
   const login = (name) => {
     const body = {
-      username: name,
+      username: "ITDepartment",
+      password: "DemoJWT1@",
     };
 
     axios
-      .post("http://localhost:3344/login", body)
+      .post("/auth/jwt/create", body)
       .then((res) => {
-        const token = res.data.accessToken;
-        console.log(res.data.accessToken);
+        const accessToken = res.data.access;
+        const refreshToken = res.data.refresh;
+        console.log(res.data);
         console.log(`${name} logged in`);
-        document.cookie = "jwt=" + token;
+        document.cookie = "access=" + accessToken;
+        document.cookie = "refresh=" + refreshToken;
       })
       .catch((err) => console.error(err));
   };
@@ -101,7 +104,7 @@ export default function RequestTester() {
           Get Request
         </Button>
         <br />
-        <div>{response[0].username}</div>
+        <div>{response}</div>
       </Card>
     </div>
   );
