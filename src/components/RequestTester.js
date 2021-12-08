@@ -11,13 +11,16 @@ export default function RequestTester() {
 
     axios
       .get("http://localhost:3344/posts", {
-        headers: { authorization: `Bearer ${jwt}` },
+        headers: { authorization: `Bearer ${getCookie("jwt")}` },
       })
       .then((res) => {
         console.log(res.data[0]);
         set_response(res.data);
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        set_response([{ username: "Error: Forbiden" }]);
+        console.error(err);
+      });
   };
 
   const login = (name) => {
@@ -31,10 +34,27 @@ export default function RequestTester() {
         const token = res.data.accessToken;
         console.log(res.data.accessToken);
         console.log(`${name} logged in`);
-        set_jwt(token);
+        document.cookie = "jwt=" + token;
       })
       .catch((err) => console.error(err));
   };
+
+  function getCookie(cname) {
+    let name = cname + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let ca = decodedCookie.split(";");
+    for (let i = 0; i < ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) === " ") {
+        c = c.substring(1);
+      }
+      if (c.indexOf(name) === 0) {
+        return c.substring(name.length, c.length);
+      }
+    }
+    return "";
+  }
+
   return (
     <div
       style={{
