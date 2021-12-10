@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Button, Card, ButtonGroup } from "@mui/material";
 import axios from "axios";
+import Cookies from "js-cookie";
 
 export default function RequestTester() {
   const [response, set_response] = useState("Make a request");
@@ -11,7 +12,7 @@ export default function RequestTester() {
 
     axios
       .get("/myapp/", {
-        headers: { Authorization: `JWT ${getCookie("access")}` },
+        headers: { Authorization: `JWT ${Cookies.get("access")}` },
       })
       .then((res) => {
         console.log("success: ", res.data);
@@ -32,31 +33,17 @@ export default function RequestTester() {
     axios
       .post("/auth/jwt/create", body)
       .then((res) => {
-        const accessToken = res.data.access;
-        const refreshToken = res.data.refresh;
+        const { access, refresh } = res.data;
+
         console.log(res.data);
         console.log(`${name} logged in`);
-        document.cookie = "access=" + accessToken;
-        document.cookie = "refresh=" + refreshToken;
+        Cookies.set("access", access);
+        Cookies.set("refresh", refresh);
       })
       .catch((err) => console.error(err));
   };
 
-  function getCookie(cname) {
-    let name = cname + "=";
-    let decodedCookie = decodeURIComponent(document.cookie);
-    let ca = decodedCookie.split(";");
-    for (let i = 0; i < ca.length; i++) {
-      let c = ca[i];
-      while (c.charAt(0) === " ") {
-        c = c.substring(1);
-      }
-      if (c.indexOf(name) === 0) {
-        return c.substring(name.length, c.length);
-      }
-    }
-    return "";
-  }
+
 
   return (
     <div
